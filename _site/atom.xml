@@ -4,7 +4,7 @@
  <title>Rick</title>
  <link href="Ryan311/atom.xml" rel="self"/>
  <link href="Ryan311"/>
- <updated>2014-03-13T00:05:57+08:00</updated>
+ <updated>2014-03-13T00:15:24+08:00</updated>
  <id>Ryan311</id>
  <author>
    <name>Rick</name>
@@ -295,15 +295,6 @@ hello_1 12426 0 - Live 0x0000000000000000 (POF)
 Oct 25 00:58:48 persnail-Vostro-2420 kernel: [ 7423.160253] Hello world 1.
 Oct 25 01:00:41 persnail-Vostro-2420 kernel: [ 7536.613425] Goodbye world 1.
 &lt;/code&gt;&lt;/pre&gt;
-</content>
- </entry>
- 
- <entry>
-   <title></title>
-   <link href="Ryan311/2013/10/23/hello-world"/>
-   <updated>2013-10-23T00:00:00+08:00</updated>
-   <id>Ryan311/2013/10/23/hello-world</id>
-   <content type="html">
 </content>
  </entry>
  
