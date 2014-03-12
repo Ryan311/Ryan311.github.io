@@ -1,0 +1,290 @@
+
+<!DOCTYPE HTML>
+<html lang="zh-ch" xmlns="http://www.w3.org/1999/xhtml" xmlns:wb="http://open.weibo.com/wb">
+<head>
+  <title>The Linux Kernel Mode Programming --- Part3 | Rick</title>
+  <meta name="description" content="" />
+  <meta name="author" content="Rick" />
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+
+  <meta name="wumiiVerification" content="b53186bf-1c2c-42e8-babc-8628eb14dd59" />
+  <!-- using baidu cdn instead
+  <link href="/assets/themes/clear/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  -->
+  <link href="http://libs.baidu.com/bootstrap/2.3.2/css/bootstrap.min.css" rel="stylesheet">
+
+
+  <!-- Google Prettify -->
+  <link href="/assets/themes/clear/google-code-prettify/desert.css" rel="stylesheet" type="text/css" media="all">
+  <!-- Google Pretty end -->
+
+  <link href="/assets/themes/clear/css/style.css" rel="stylesheet" type="text/css" media="all" />
+  <!-- using baidu cdn instead
+  <script type="text/javascript" src="/static/js/jquery-1.8.3.min.js"></script>
+  -->
+
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.min.js"></script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+
+<body>
+
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="/">Home</a>
+        <ul class="nav">
+          <li><a href="/archive.html">Archive</a></li>
+          <li><a href="/about.html">About</a></li>
+        </ul>
+        <ul class="pull-right">
+          <li>
+            <form class="navbar-search" method="get" action="http://www.google.com/search" target="google_window">
+              <input id="g_search" type="text" class="search-query" placeholder="Search..." name="q" />
+              <input type="submit" name="btnG" style="display:none" id="searchsubmit" value="Search" />
+              <input type="hidden" name="ie" value="UTF-8" />
+              <input type="hidden" name="oe" value="UTF-8" />
+              <input type="hidden" name="hl" value="zh-CN" />
+              <input type="hidden" name="domains" value="http://Ryan311.github.com/" />
+              <input type="hidden" name="sitesearch" value="http://Ryan311.github.com/" />
+            </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container page-container">
+    <div class="content">
+      
+<div class="page-header">
+  <h1>The Linux Kernel Mode Programming --- Part3</h1>
+</div>
+
+<div class="row-fluid page-body">
+  <div class="span9 left">
+    <div class="main-container shadow">
+      <div class="mainbody thepost">
+        
+<h2 id="modules-vs-programs">Modules <em>VS</em> Programs</h2>
+
+<h3 id="begin-and-end">Begin and End</h3>
+<p>应用程序开始于一个main()函数，执行一些指令后就结束。
+模块的工作方式略有不同。一个模块开始于init_module()或是由宏module_init()指定的初始化函数。这个函数是模块的入口函数，它告诉内核该模块提供了哪些功能并使内核在需要的时候调用模块的功能函数。该入口函数执行完成时就退出，内核只有在需要的时候才会调用模块提供的代码。
+所有的模块在从内核卸载时调用cleanup_module或宏module_exit()指定的退出函数。它会反注册掉入口函数提供到内核的功能函数</p>
+
+<h3 id="functions-available-to-modules">Functions available to modules</h3>
+<p>模块不能调用标准I/O库，只能调用由内核提供的函数，内核的导出函数可以查看/proc/kallsyms</p>
+
+<p>系统调用运行在内核空间，由内核提供。标准库函数运行在用户空间，提供比系统调用更为方便的接口, 当完成一项具体功能时，标准库中的函数会调用相对应的系统调用。
+可以用<em>strace</em>来查看程序中调用了哪些系统调用。</p>
+
+<h3 id="user-space-vs-kernel-space">User Space VS Kernel Space</h3>
+<p>在Windows中，称为User Mode和Kernel Mode, 意义相同。
+CPU能够运行在不同的模式中，在Intel IA32体系结构中有４种模式，ring 0、１、２、３。Unix和Windows都使用了其中的两个ring，ring0(supervisor mode)和ring4(the lowest ring)</p>
+
+<h3 id="name-space">Name Space</h3>
+<p>当写内核代码时，即使最小的模块也会链接到整个内核。如果一个模块导出的变量与另一个模块导出的变量相同，就会引起命令冲突。这种问题的解决方法是将你的变量都定义成静态的并且所有的符号都使用良好定义的前缀。内核使用的前缀都是小写的。如果你不想将所有符号都定义为静态的，另一种选择是声明一个符号表，并在内核中注册它。</p>
+
+<h3 id="code-space">Code Space</h3>
+<p>应用程序使用虚拟地址空间，由内存管理器分配并管理,将虚拟地址映射到实际的物理地址。任何两个程序使用的地址空间是相互独立的。</p>
+
+<p>内核也有自己的内存地址空间。因为模块可以动态的加载或卸载到内核中，它拥有与内核相同的地址空间，而不是有独享的空间。所以如果你的模块发生段错误，整个内核就会发生段错误，这是非常危险的。</p>
+
+<h3 id="device-drivers">Device Drivers</h3>
+<p>设备驱动程序是一种类型的模块，向内核提供访问硬件的功能。在Unix系统中，每个硬件设备由/dev中的一个文件表示。</p>
+
+<p>每个硬件设备由一个主设备号和次设备号来表示。主设备号表示哪种驱动可以用于访问该硬件，每个Driver都被赋于一个唯一的主设备号。拥有相同主设备号的设备文件（设备）由相同的驱动程序来管理。
+设备驱动程序通过次设备号来区分由它控制的不同的设备。
+设备可以分成三类: 字符设备、块设备、网络设备
+当系统安装时，设备文件由<em>mknod</em>命令来创建，创建新的字符设备文件</p>
+
+<pre><code>mknod /dev/coffee c 12 2
+</code></pre>
+
+<p>新的字符设备文件的主／次设备号为12, 2。</p>
+
+<p>内核只关心设备的主设备号，它告诉内核要使用哪种设备驱动程序来操作该设备。内核不会使用次设备号。驱动程序中才会用到它，用于定位具体的设备。</p>
+
+      </div>
+    </div>
+
+    <div class="main-container shadow">
+      <div class="mainbody">
+        <div class="bshare-custom">
+   <span id="bshare-shareto">分享到</span>
+
+   <a title="新浪微博" class="bshare-sinaminiblog"></a>
+   <a title="腾讯微博" class="bshare-qqmb"></a>
+   <a title="人人网" class="bshare-renren"></a>
+
+   <a title="更多平台" id="bshare-more-icon" class="bshare-more"></a>
+   <span class="BSHARE_COUNT bshare-share-count">--</span>
+</div>
+<script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/buttonLite.js#uuid=5a2a17c9-1a8e-4f45-a3f7-3c7c5600efda&style=-1"></script>
+<script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/bshareC2.js"></script>
+        
+        <!--<div class="post-end">
+    <strong>
+    <p>欢迎转载，转载请注明作者及出处<a href="http://blog.EverCoding.net" ref="nofollow">EverCoding.net</a>，请勿用于商业用途</p>
+    <p>本文地址：<a href="Ryan311/2013/10/27/the-linux-kernel-mode-programming-----part3" ref="nofollow">Ryan311/2013/10/27/the-linux-kernel-mode-programming-----part3</a></p>
+    </strong>
+</div>
+-->
+
+        <div class="pagination">
+          <ul>
+          
+            <li class="prev"><a href="/2013/10/27/the-linux-kernel-mode-programming-----part2" title="The Linux Kernel Mode Programming --- Part2">&larr; Previous</a></li>
+          
+            <li><a href="/archive.html">Archive</a></li>
+          
+            <li class="next disabled"><a>Next &rarr;</a>
+          
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-container shadow">
+      <div class="mainbody">
+        <button class="btn-primary btn-small" id="show_disqus">Show Comments</button>
+        <script type="text/javascript">
+          $(function() {
+            $('#show_disqus').click(function() {
+              var s = '<div id="disqus_thread"></div><script type="text/javascript">';
+              s += 'var disqus_developer = 1;';
+              s += "var disqus_shortname = '';";
+              s += " var disqus_identifier = '/2013/10/27/the-linux-kernel-mode-programming-----part3';";
+              s += "var disqus_url = 'Ryan311/2013/10/27/the-linux-kernel-mode-programming-----part3';"
+              s += "(function() {var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);})();";
+              s += '</' + 'script>';
+              $('#show_disqus').after('<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>').after('<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>').after(s).hide();
+            });
+          });
+        </script>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="span3 right">
+    <div class="side-container shadow">
+      <div class="sidebar">
+        <h4>Published</h4>
+        <div class="date"><span>2013-10-27</span></div>
+      </div>
+    </div>
+
+    <div class="side-container shadow">
+      <div class="sidebar">
+        
+          <h4>Tags</h4>
+          <ul class="tag_box">
+          
+          
+
+
+  
+     
+    	<li><a href="/tags.html#Linux-ref">Linux <span>3</span></a></li>
+    
+  
+
+
+
+          </ul>
+        
+      </div>
+    </div>
+
+    <div class="side-container shadow">
+      <div class="sidebar">
+        <script type="text/javascript" id="wumiiRelatedItems"></script>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<script type="text/javascript">
+    var wumiiPermaLink = "Ryan311/2013/10/27/the-linux-kernel-mode-programming-----part3";
+    var wumiiTitle = "The Linux Kernel Mode Programming --- Part3";
+    var wumiiTags = "Linux";
+    var wumiiCategories = [];
+    var wumiiSitePrefix = "http://blog.evercoding.net/";
+    var wumiiParams = "&num=5&mode=3&pf=JAVASCRIPT";
+</script>
+<script type="text/javascript" src="http://widget.wumii.cn/ext/relatedItemsWidget"></script>
+<a href="http://www.wumii.com/widget/relatedItems" style="border:0;">
+    <img src="http://static.wumii.cn/images/pixel.png" alt="无觅相关文章插件，快速提升流量" style="border:0;padding:0;margin:0;" />
+</a>
+
+
+
+    </div>
+
+    <footer>
+        <p>&copy; 2013 <span id="now_year"></span> Rick. </p>
+        <script type="text/javascript">
+          var now_year = new Date().getFullYear();
+          if (now_year != 2013) {
+              $('#now_year').html('- ' + now_year);
+          }
+        </script>
+      </footer>
+  </div>
+
+  <!--<script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js" type="text/javascript" charset="utf-8"></script>-->
+  <script type="text/javascript" src="/assets/themes/clear/google-code-prettify/prettify.js"></script>
+  <script type="text/javascript">
+    $(function() {
+
+      $('a[href^="http"]').each(function () {
+        $(this).attr('target', '_blank');
+      });
+
+      $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto');
+      window.prettyPrint && prettyPrint();
+
+      function traverse($node, len, maxCount) {
+        var reachMaxCount = len > maxCount;
+        if (reachMaxCount) {
+          $node.hide();
+        }
+        var $contents = $node.contents();
+        for (var i = 0; i < $contents.length; ++i) {
+          if (reachMaxCount) {
+            $contents.eq(i).hide();
+            continue;
+          }
+          if ($contents[i].nodeType == 3) { // TextNode
+            var tmp = len;
+            var s = $contents[i].nodeValue;
+            len += s.length;
+            reachMaxCount = len > maxCount;
+            if (reachMaxCount && $contents[i].parentNode.nodeName != 'A') {
+              $contents[i].nodeValue = s.substring(0, maxCount - tmp);
+            }
+          }
+          else if ($contents[i].nodeType == 1) { // Element
+            len = traverse($contents.eq(i), len, maxCount);
+          }
+        }
+        return len;
+      }
+
+      $('.post_at_index').each(function() {
+        var count = traverse($(this), 0, 200);
+        if (count > 200) {
+          var thisUrl = $(this).siblings().first().children().attr('href');
+          $(this).after('\n<a href="' + thisUrl + '" rel="nofollow">' + 'Read More ...</a>');
+        }
+      });
+    });
+  </script>
+  
+</body>
+</html>
+

@@ -1,0 +1,275 @@
+
+<!DOCTYPE HTML>
+<html lang="zh-ch" xmlns="http://www.w3.org/1999/xhtml" xmlns:wb="http://open.weibo.com/wb">
+<head>
+  <title>Tags | Rick</title>
+  
+  <meta name="author" content="Rick" />
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+
+  <meta name="wumiiVerification" content="b53186bf-1c2c-42e8-babc-8628eb14dd59" />
+  <!-- using baidu cdn instead
+  <link href="/assets/themes/clear/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  -->
+  <link href="http://libs.baidu.com/bootstrap/2.3.2/css/bootstrap.min.css" rel="stylesheet">
+
+
+  <!-- Google Prettify -->
+  <link href="/assets/themes/clear/google-code-prettify/desert.css" rel="stylesheet" type="text/css" media="all">
+  <!-- Google Pretty end -->
+
+  <link href="/assets/themes/clear/css/style.css" rel="stylesheet" type="text/css" media="all" />
+  <!-- using baidu cdn instead
+  <script type="text/javascript" src="/static/js/jquery-1.8.3.min.js"></script>
+  -->
+
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.min.js"></script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+
+<body>
+
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="/">Home</a>
+        <ul class="nav">
+          <li><a href="/archive.html">Archive</a></li>
+          <li><a href="/about.html">About</a></li>
+        </ul>
+        <ul class="pull-right">
+          <li>
+            <form class="navbar-search" method="get" action="http://www.google.com/search" target="google_window">
+              <input id="g_search" type="text" class="search-query" placeholder="Search..." name="q" />
+              <input type="submit" name="btnG" style="display:none" id="searchsubmit" value="Search" />
+              <input type="hidden" name="ie" value="UTF-8" />
+              <input type="hidden" name="oe" value="UTF-8" />
+              <input type="hidden" name="hl" value="zh-CN" />
+              <input type="hidden" name="domains" value="http://Ryan311.github.com/" />
+              <input type="hidden" name="sitesearch" value="http://Ryan311.github.com/" />
+            </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container page-container">
+    <div class="content">
+      
+<div class="page-header">
+  <h1>Tags </h1>
+</div>
+
+<div class="row page-body">
+  <div class="span12">
+    <div class="main-container shadow">
+      <div class="mainbody">
+        
+
+<ul class="tag_box inline">
+    
+  
+
+
+  
+     
+    	<li><a href="/tags.html#OpenGL-ref">OpenGL <span>1</span></a></li>
+     
+    	<li><a href="/tags.html#Linux-ref">Linux <span>3</span></a></li>
+     
+    	<li><a href="/tags.html#Jekyll-ref">Jekyll <span>1</span></a></li>
+    
+  
+
+
+
+</ul>
+
+
+ 
+  <h3 id="OpenGL-ref">OpenGL</h3>
+  <ul class="post">
+      
+    
+
+
+  
+    
+      
+      	
+      	<li><a href="/2013/10/26/opengl">初识OpenGL</a></li>
+      	
+      
+    
+  
+
+
+
+  </ul>
+ 
+  <h3 id="Linux-ref">Linux</h3>
+  <ul class="post">
+      
+    
+
+
+  
+    
+      
+      	
+      	<li><a href="/2013/10/27/the-linux-kernel-mode-programming-----part3">The Linux Kernel Mode Programming --- Part3</a></li>
+      	
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/2013/10/27/the-linux-kernel-mode-programming-----part2">The Linux Kernel Mode Programming --- Part2</a></li>
+      	
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/2013/10/24/the-linux-kernel-mode-programming-----part1">The Linux Kernel Mode Programming---Part1</a></li>
+      	
+      
+    
+  
+
+
+
+  </ul>
+ 
+  <h3 id="Jekyll-ref">Jekyll</h3>
+  <ul class="post">
+      
+    
+
+
+  
+    
+      
+      	
+      	<li><a href="/2013/10/23/build-my-personal-site-with-jekyll">Build My Personal Site with Jekyll</a></li>
+      	
+      
+    
+  
+
+
+
+  </ul>
+
+
+<style type="text/css">
+  .showing a { color: #000; font-weight: bold;}
+</style>
+
+<script type="text/javascript">
+  $(function() {
+    var $categories = $('h3');
+    var $posts = $('.post');
+    var $tab = $('ul.tag_box');
+    var h = window.location.hash;
+    if (h == '') {
+      $categories.hide().first().show();
+      $posts.hide().first().show();
+      $tab.children().first().addClass('showing');
+    }
+    else {
+      h = h.substring(1);
+      for (var i = $categories.length - 1; i >= 0; --i) {
+        if ($categories.eq(i)[0].id == h) {
+          $categories.hide().eq(i).show();
+          $posts.hide().eq(i).show();
+          $tab.children().eq(i).addClass('showing')
+          break;
+        }
+      }
+
+    }
+    $('ul.tag_box').children().each(function(index) {
+      $(this).click(function() {
+        $categories.hide().eq(index).show();
+        $posts.hide().eq(index).show();
+        $(this).addClass('showing').siblings().removeClass('showing');
+        // return false;
+      });
+    });
+  });
+</script>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    </div>
+
+    <footer>
+        <p>&copy; 2013 <span id="now_year"></span> Rick. </p>
+        <script type="text/javascript">
+          var now_year = new Date().getFullYear();
+          if (now_year != 2013) {
+              $('#now_year').html('- ' + now_year);
+          }
+        </script>
+      </footer>
+  </div>
+
+  <!--<script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js" type="text/javascript" charset="utf-8"></script>-->
+  <script type="text/javascript" src="/assets/themes/clear/google-code-prettify/prettify.js"></script>
+  <script type="text/javascript">
+    $(function() {
+
+      $('a[href^="http"]').each(function () {
+        $(this).attr('target', '_blank');
+      });
+
+      $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto');
+      window.prettyPrint && prettyPrint();
+
+      function traverse($node, len, maxCount) {
+        var reachMaxCount = len > maxCount;
+        if (reachMaxCount) {
+          $node.hide();
+        }
+        var $contents = $node.contents();
+        for (var i = 0; i < $contents.length; ++i) {
+          if (reachMaxCount) {
+            $contents.eq(i).hide();
+            continue;
+          }
+          if ($contents[i].nodeType == 3) { // TextNode
+            var tmp = len;
+            var s = $contents[i].nodeValue;
+            len += s.length;
+            reachMaxCount = len > maxCount;
+            if (reachMaxCount && $contents[i].parentNode.nodeName != 'A') {
+              $contents[i].nodeValue = s.substring(0, maxCount - tmp);
+            }
+          }
+          else if ($contents[i].nodeType == 1) { // Element
+            len = traverse($contents.eq(i), len, maxCount);
+          }
+        }
+        return len;
+      }
+
+      $('.post_at_index').each(function() {
+        var count = traverse($(this), 0, 200);
+        if (count > 200) {
+          var thisUrl = $(this).siblings().first().children().attr('href');
+          $(this).after('\n<a href="' + thisUrl + '" rel="nofollow">' + 'Read More ...</a>');
+        }
+      });
+    });
+  </script>
+  
+</body>
+</html>
+

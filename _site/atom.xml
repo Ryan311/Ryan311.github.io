@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ 
+ <title>Rick</title>
+ <link href="Ryan311/atom.xml" rel="self"/>
+ <link href="Ryan311"/>
+ <updated>2014-03-12T23:44:20+08:00</updated>
+ <id>Ryan311</id>
+ <author>
+   <name>Rick</name>
+   <email>persnail311@gmail.com</email>
+ </author>
+
+ 
+ <entry>
+   <title>The Linux Kernel Mode Programming --- Part3</title>
+   <link href="Ryan311/2013/10/27/the-linux-kernel-mode-programming-----part3"/>
+   <updated>2013-10-27T00:00:00+08:00</updated>
+   <id>Ryan311/2013/10/27/the-linux-kernel-mode-programming-----part3</id>
+   <content type="html">
+&lt;h2 id=&quot;modules-vs-programs&quot;&gt;Modules &lt;em&gt;VS&lt;/em&gt; Programs&lt;/h2&gt;
+
+&lt;h3 id=&quot;begin-and-end&quot;&gt;Begin and End&lt;/h3&gt;
+&lt;p&gt;应用程序开始于一个main()函数，执行一些指令后就结束。
+模块的工作方式略有不同。一个模块开始于init_module()或是由宏module_init()指定的初始化函数。这个函数是模块的入口函数，它告诉内核该模块提供了哪些功能并使内核在需要的时候调用模块的功能函数。该入口函数执行完成时就退出，内核只有在需要的时候才会调用模块提供的代码。
+所有的模块在从内核卸载时调用cleanup_module或宏module_exit()指定的退出函数。它会反注册掉入口函数提供到内核的功能函数&lt;/p&gt;
+
+&lt;h3 id=&quot;functions-available-to-modules&quot;&gt;Functions available to modules&lt;/h3&gt;
+&lt;p&gt;模块不能调用标准I/O库，只能调用由内核提供的函数，内核的导出函数可以查看/proc/kallsyms&lt;/p&gt;
+
+&lt;p&gt;系统调用运行在内核空间，由内核提供。标准库函数运行在用户空间，提供比系统调用更为方便的接口, 当完成一项具体功能时，标准库中的函数会调用相对应的系统调用。
+可以用&lt;em&gt;strace&lt;/em&gt;来查看程序中调用了哪些系统调用。&lt;/p&gt;
+
+&lt;h3 id=&quot;user-space-vs-kernel-space&quot;&gt;User Space VS Kernel Space&lt;/h3&gt;
+&lt;p&gt;在Windows中，称为User Mode和Kernel Mode, 意义相同。
+CPU能够运行在不同的模式中，在Intel IA32体系结构中有４种模式，ring 0、１、２、３。Unix和Windows都使用了其中的两个ring，ring0(supervisor mode)和ring4(the lowest ring)&lt;/p&gt;
+
+&lt;h3 id=&quot;name-space&quot;&gt;Name Space&lt;/h3&gt;
+&lt;p&gt;当写内核代码时，即使最小的模块也会链接到整个内核。如果一个模块导出的变量与另一个模块导出的变量相同，就会引起命令冲突。这种问题的解决方法是将你的变量都定义成静态的并且所有的符号都使用良好定义的前缀。内核使用的前缀都是小写的。如果你不想将所有符号都定义为静态的，另一种选择是声明一个符号表，并在内核中注册它。&lt;/p&gt;
+
+&lt;h3 id=&quot;code-space&quot;&gt;Code Space&lt;/h3&gt;
+&lt;p&gt;应用程序使用虚拟地址空间，由内存管理器分配并管理,将虚拟地址映射到实际的物理地址。任何两个程序使用的地址空间是相互独立的。&lt;/p&gt;
+
+&lt;p&gt;内核也有自己的内存地址空间。因为模块可以动态的加载或卸载到内核中，它拥有与内核相同的地址空间，而不是有独享的空间。所以如果你的模块发生段错误，整个内核就会发生段错误，这是非常危险的。&lt;/p&gt;
+
+&lt;h3 id=&quot;device-drivers&quot;&gt;Device Drivers&lt;/h3&gt;
+&lt;p&gt;设备驱动程序是一种类型的模块，向内核提供访问硬件的功能。在Unix系统中，每个硬件设备由/dev中的一个文件表示。&lt;/p&gt;
+
+&lt;p&gt;每个硬件设备由一个主设备号和次设备号来表示。主设备号表示哪种驱动可以用于访问该硬件，每个Driver都被赋于一个唯一的主设备号。拥有相同主设备号的设备文件（设备）由相同的驱动程序来管理。
+设备驱动程序通过次设备号来区分由它控制的不同的设备。
+设备可以分成三类: 字符设备、块设备、网络设备
+当系统安装时，设备文件由&lt;em&gt;mknod&lt;/em&gt;命令来创建，创建新的字符设备文件&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;mknod /dev/coffee c 12 2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;新的字符设备文件的主／次设备号为12, 2。&lt;/p&gt;
+
+&lt;p&gt;内核只关心设备的主设备号，它告诉内核要使用哪种设备驱动程序来操作该设备。内核不会使用次设备号。驱动程序中才会用到它，用于定位具体的设备。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>The Linux Kernel Mode Programming --- Part2</title>
+   <link href="Ryan311/2013/10/27/the-linux-kernel-mode-programming-----part2"/>
+   <updated>2013-10-27T00:00:00+08:00</updated>
+   <id>Ryan311/2013/10/27/the-linux-kernel-mode-programming-----part2</id>
+   <content type="html">
+&lt;h2 id=&quot;section&quot;&gt;宏&lt;/h2&gt;
+
+&lt;p&gt;在Linux2.4之后，引入了如下两个宏，在模块中就没有必要使用init_module()和cleanup_module()，而是可以自定义实现这两个功能的函数, part1中的模块可以改写为&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;linux/module.h&amp;gt;   //Needed for all modules
+#include &amp;lt;linux/kernel.h&amp;gt;   //Needed for KERN_INFO
+#include &amp;lt;linux/init.h&amp;gt;     //Needed for the macros
+
+static int __init hello_2_init(void)
+{
+    printk(KERN_INFO &quot;Hello, world 2\n&quot;);
+    return 0;
+}
+
+static void __exit hello_2_exit(void)
+{
+    printk(KERN_INFO &quot;Goodbye, world 2\n&quot;);
+}
+
+module_init(hello_2_init);
+module_exit(hello_2_exit);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;__init表示模块加载到内核时，首先执行hello_2_init()函数，执行完后就可以释放掉该函数所占的内存区，它在之后不会再用到。&lt;/li&gt;
+  &lt;li&gt;__exit表示模块加载到内核后，只有当该模块从内核中卸载掉时才执行函数hello_2_exit()&lt;/li&gt;
+  &lt;li&gt;module_init()   声明初始化函数init function&lt;/li&gt;
+  &lt;li&gt;module_exit()   声明清理函数cleanup function&lt;/li&gt;
+  &lt;li&gt;MODULE_LICENSE(&amp;#8220;GPL&amp;#8221;)    声明代码遵循的GPL协议&lt;/li&gt;
+  &lt;li&gt;MODULE_AUTHOR()         该模块是谁写的&lt;/li&gt;
+  &lt;li&gt;MODULE_DESCRIPTION()    该模块的简单功能描述&lt;/li&gt;
+  &lt;li&gt;more in linux/init.h&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;向模块传递参数&lt;/h2&gt;
+&lt;p&gt;模块在加载的时候可以带有命令行参数，但和传统的程序中的argc/argv不同。&lt;/p&gt;
+
+&lt;p&gt;为了能向模块传递参数，模块要导出变量变量的名字以便加载模块的程序(insmod)可以看到, 要用到宏module_param()（defined in linux/moduleparam.h)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/* 
+ * module_param(var, int, 0000)
+ *  The first param is the parameters name
+ *  The second param is it's data type
+ *  The final argument is the permissions bits, 
+ *  for exposing parameters in sysfs (if non-zero) at a later stage.
+ */
+int myint = 3;
+module_param(myint, int 0);
+
+/*
+ * module_param_array(arr, type, num, perm);
+ *  The first param is the parameter's (in this case the array's) name
+ *  The second param is the data type of the elements of the array
+ *  The third argument is a pointer to the variable that will store the number 
+ *  of elements of the array initialized by the user at module loading time
+ *  The fourth argument is the permission bits
+ */
+int myinitarray[2];
+module_param_array(myintarray, int , NULL, 0);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在加载模块时就可以使用如下命令&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo insmod mymodule.ko myint=5
+&lt;/code&gt;&lt;/pre&gt;
+
+</content>
+ </entry>
+ 
+ <entry>
+   <title>初识OpenGL</title>
+   <link href="Ryan311/2013/10/26/opengl"/>
+   <updated>2013-10-26T00:00:00+08:00</updated>
+   <id>Ryan311/2013/10/26/opengl</id>
+   <content type="html">
+&lt;p&gt;&lt;em&gt;什么是OpenGL?&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;OpenGL是图形硬件的一种软件接口，它的设计目标是作为一种流线型的、独立于硬件的接口，在许多不同的硬件平台上实现。
+OpenGL并不是一种编程语言，而更像是一个Ｃ运行时函数库，提供一些预包装的功能，帮助开发人员编写功能强大的三维图形应用程度。&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;历史？&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;OpenGL的前身是SGI公司开发的IRIS GL图形函数库。SGI是一家久负盛名的公司，在计算机图形和动画领域处于领先地位。IRIS GL最初是一个2D图形函数库，后来逐渐演化为SGI的高端IRIS图形工作站所使用的3D编程API。后来，由于图形技术的发展，SGI对IRIS GL的移植性进行了改进和提高，使它逐步发展成如今的OpenGL。&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;术语&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;渲染(rendering):    计算机根据模型创建图像的过程
+模型(model):        是根据几何图元创建的，也称为物体(Object)
+OpenGL渲染环境:     是OpenGL在其中存储状态信息的数据结构、渲染图像的时候要用到这些信息。
+模式(profile):      OpenGL 3.0引入该概念，是特定于应用程序领域的OpenGL功能集的子集&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;OpenGL函数&lt;/em&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;每个OpenGL函数的前缀为&amp;#8221;gl&amp;#8221;&lt;/li&gt;
+  &lt;li&gt;组成函数的每个单词的首字母都用大写,如&amp;#8221;glClearColor()&amp;#8221;&lt;/li&gt;
+  &lt;li&gt;&amp;#8220;glVertex3f()&amp;#8221;, 3表示该函数接收三个参数，f表示参数类型为float。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;em&gt;OpenGL实用工具库(GLUT)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Install on Ubuntu12.04&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install build-essential
+$ sudo apt-get install libgl1-mesa-dev
+$ sudo apt-get intsall freeglut3-dev
+&lt;/code&gt;&lt;/pre&gt;
+
+</content>
+ </entry>
+ 
+ <entry>
+   <title>The Linux Kernel Mode Programming---Part1</title>
+   <link href="Ryan311/2013/10/24/the-linux-kernel-mode-programming-----part1"/>
+   <updated>2013-10-24T00:00:00+08:00</updated>
+   <id>Ryan311/2013/10/24/the-linux-kernel-mode-programming-----part1</id>
+   <content type="html">
+&lt;h2 id=&quot;kernel-module&quot;&gt;什么是Kernel module？&lt;/h2&gt;
+&lt;p&gt;内核模块是能够在需要的时候动态的加载或卸载的代码块，他们扩展了内核的功能而不需要重启系统。例如， 驱动程序就是一种类型的内核模块，允许内核访问连接到系统的硬件设备。如果没有内核，我们就需要重新编译内核并把新的功能加到内核映像中去，这会使得内核越来越大，且要求每次添加新功能时都要重新编译并重新启动系统。&lt;/p&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;模块是怎样加载到内核的？&lt;/h2&gt;
+&lt;p&gt;查看已经加载内核模块&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ lsmod
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;例： 需要加载模块msdos.ko到内核，而msdos.ko信赖于fat.ko&lt;/p&gt;
+
+&lt;h3 id=&quot;insmod&quot;&gt;手动加载内核模块, 使用命令insmod&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo insmod /lib/modules/2.6.11/kernel/fs/fat/fat.ko
+$ sudo insmod /lib/modules/2.6.11/kernel/fs/msdos/msdos.ko
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;modprobe&quot;&gt;智能方式加载内核模块， modprobe&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;$ modprobe msdos
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;可见，modprobe只需提供内核的名称就可以加载内核，而insmod要提供路径名及模块依赖关系。modprobe是如何工作的呢？
+*   首先， 如果内核需要有一个模块的功能但该模块还没有加载到内核中，则内核模块守护进程（服务）&lt;em&gt;kmod&lt;/em&gt;调用&lt;strong&gt;modprobe&lt;/strong&gt;来加载这个模块, 并提供该模块的名字msdos
+*   然后&lt;strong&gt;modprobe&lt;/strong&gt;去查看&lt;em&gt;/etc/modprobe.conf&lt;/em&gt;看是否该模块是个别名。下一步，&lt;strong&gt;modprobe&lt;/strong&gt;查看&lt;em&gt;/lib/modules/version/modules.dep&lt;/em&gt;, 查看模块的依赖，该文件是由&lt;em&gt;depmod -a&lt;/em&gt;创建的包含了模块的依赖关系。
+*   最后，&lt;strong&gt;modprobe&lt;/strong&gt;使用&lt;strong&gt;insmod&lt;/strong&gt;先加载fat.ko，并提供完整路径名，然后再加载dos.ko&lt;/p&gt;
+
+&lt;h3 id=&quot;the-simplest-module-hello-world&quot;&gt;The Simplest Module “Hello， World”&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;/* 
+*   hello-1.c - The simplest kernel module
+*/
+#include &amp;lt;linux/module.h&amp;gt;
+#include &amp;lt;linux/kernel.h&amp;gt;
+
+int init_module(void)
+{
+    printk(KERN_INFO &quot;Hello world 1\n&quot;);
+    return 0;   //non 0 means failed, module can't be loaded
+}
+
+void cleanup_module(void)
+{
+    printk(KERN_INFO &quot;Goodby world 1.\n&quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;内核模块至少有两个函数
++   start func:     init_module(), 当模块被加载到内核时被调用
++   end func:       cleanup_module(), 当模块从内核中卸载时被调用 
++   从内核2.3.13之后，这两个名字是可以改变的，可以指定任意的名字&lt;/p&gt;
+
+&lt;p&gt;每个模块都要包含&lt;em&gt;linux/module.h&lt;/em&gt;, 当要用到printk()时要包含&lt;em&gt;linux/kernel.h&lt;/em&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;printk&quot;&gt;printk&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;printk&lt;/strong&gt;是内核的log机制，目的是记录信息或是给出一些警告。每个printk()都要指明优先级，共有8个优先级每个都有macro对应，默认的是DEFAULT_MESSAGE_LOGLEVEL。
+当&lt;em&gt;syslogd&lt;/em&gt;和&lt;em&gt;klogd&lt;/em&gt;在运行时，log信息被保存在&lt;em&gt;/var/log/messages&lt;/em&gt;中。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;编译内核模块&lt;/h3&gt;
+&lt;p&gt;Makefile&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;obj-m += hello-1.o
+all:
+    make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+clean:
+    make -C /lib/modules/$(shell uanme -r)/build M=$(PWD) clean
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;then run make in terminal&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ make
+make -C /lib/modules/3.8.0-29-generic/build M=/home/persnail/workspace/git/repos/LKMPG/HelloWorld1 modules
+make[1]: Entering directory `/usr/src/linux-headers-3.8.0-29-generic'
+  CC [M]  /home/persnail/workspace/git/repos/LKMPG/HelloWorld1/hello-1.o
+  Building modules, stage 2.
+  MODPOST 1 modules
+  CC      /home/persnail/workspace/git/repos/LKMPG/HelloWorld1/hello-1.mod.o
+  LD [M]  /home/persnail/workspace/git/repos/LKMPG/HelloWorld1/hello-1.ko
+make[1]: Leaving directory `/usr/src/linux-headers-3.8.0-29-generic'
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;hello-1.ko&lt;/strong&gt;就是编译完成的内核模块，查看它的信息&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ modinfo hello-1.ko
+filename:       hello-1.ko
+srcversion:     140276773A3090F6F33891F
+depends:        
+vermagic:       3.8.0-29-generic SMP mod_unload modversions
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;加载内核模块&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo insmod ./hello-1.ko
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;查看是否已经加载&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat /proc/modules | grep hello
+hello_1 12426 0 - Live 0x0000000000000000 (POF)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;卸载内核模块&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo rmmod hello-1.ko
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;查看log信息&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ less /var/log/syslog 
+Oct 25 00:58:48 persnail-Vostro-2420 kernel: [ 7423.160253] Hello world 1.
+Oct 25 01:00:41 persnail-Vostro-2420 kernel: [ 7536.613425] Goodbye world 1.
+&lt;/code&gt;&lt;/pre&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title></title>
+   <link href="Ryan311/2013/10/23/hello-world"/>
+   <updated>2013-10-23T00:00:00+08:00</updated>
+   <id>Ryan311/2013/10/23/hello-world</id>
+   <content type="html">
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Build My Personal Site with Jekyll</title>
+   <link href="Ryan311/2013/10/23/build-my-personal-site-with-jekyll"/>
+   <updated>2013-10-23T00:00:00+08:00</updated>
+   <id>Ryan311/2013/10/23/build-my-personal-site-with-jekyll</id>
+   <content type="html">
+&lt;p&gt;Jekyll  /d3i:kel/&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;静态站点生成器，它会根据网页源码生成静态文件，它提供了模板、变量、插件等功能。&lt;/li&gt;
+  &lt;li&gt;_site目录就是实际网站的内容&lt;/li&gt;
+  &lt;li&gt;任何以下划线开头的文件和目录都不会成为网站的一部分, 如_layouts&lt;/li&gt;
+  &lt;li&gt;任何不以下划线开头的文件和目录都会被复制到生成的网站中(默认为_site)&lt;/li&gt;
+  &lt;li&gt;有YAML front matter的任何文件(不以下划线开头)将会先被Jekyll处理然后才被放进_site目录中&lt;/li&gt;
+  &lt;li&gt;如果不以YFM开头，将会直接被放进_site目录&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Install on Ubuntu&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo apt-get install ruby1.9.1 rubygems1.8 libyaml-ruby libopenssl-ruby
+sudo apt-get install python-pygments
+sudo gem install json
+sudo gem install rdoc
+sudo gem install jekyll
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;安装Jekyll bootstrap&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ git clone https://github.com/plusjade/jekyll-bootstrap.git USERNAME.github.com
+$ cd USERNAME.github.com
+$ git remote set-url origin git@github.com:USERNAME/USERNAME.github.com.git
+$ git push origin master
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;本地预览Blog&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ git clone https://github.com/plusjade/jekyll-bootstrap.git
+$ cd jekyll-bootstrap
+$ jekyll server
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在浏览器中预览[http://localhost:4000]&lt;/p&gt;
+
+&lt;p&gt;更换&lt;a href=&quot;http://themes.jekyllbootstrap.com/preview/hooligan/&quot;&gt;themes&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;rake theme:install git=&quot;https://github.com/dhulihan/hooligan.git&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Create a Post and Page
+具体内容要看Rakefile文件，例如:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;rake post title=&quot;Hello Jekyll&quot;
+rake page name=&quot;about.md&quot; or &quot;pages/about.md&quot; or &quot;pages/about&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Basic Usage&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ jekyll build
+# =&amp;gt; The current folder will be generated into ./_site
+
+$ jekyll build --destination &amp;lt;destination&amp;gt;
+# =&amp;gt; The current folder will be generated into &amp;lt;destination&amp;gt;
+
+$ jekyll build --source &amp;lt;source&amp;gt; --destination &amp;lt;destination&amp;gt;
+# =&amp;gt; The &amp;lt;source&amp;gt; folder will be generated into &amp;lt;destination&amp;gt;
+
+$ jekyll build --watch
+# =&amp;gt; The current folder will be generated into ./_site,
+#    watched for changes, and regenerated automatically.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;使用别人的模板建立自己的Blog&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;git clone 别人的模板&lt;/li&gt;
+  &lt;li&gt;删除掉.git&lt;/li&gt;
+  &lt;li&gt;修改_config.yml中的个人信息为自己的&lt;/li&gt;
+  &lt;li&gt;修改_include/themes/default.html中的个人信息为自己的，也可以删除掉一些自己不需要的内容&lt;/li&gt;
+  &lt;li&gt;git post tagline=&amp;#8221;hello world&amp;#8221;&lt;/li&gt;
+  &lt;li&gt;本地查看jekyll build, jekyll server&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;我使用模板的是(http://blog.evercoding.net/), &lt;a href=&quot;https://github.com/mojombo/jekyll/wiki/Sites&quot;&gt;More&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Reference&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://wowubuntu.com/markdown/#overview&quot;&gt;Markdown语法说明&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://jekyllbootstrap.com/usage/jekyll-quick-start.html&quot;&gt;JekyllQuickStart&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://jekyllbootstrap.com/lessons/jekyll-introduction.html&quot;&gt;Jekyll Introduction&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://yanping.me/cn/blog/2011/12/15/building-static-sites-with-jekyll&quot;&gt;用Jekyll构建静态网站&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+ </entry>
+ 
+ 
+</feed>
