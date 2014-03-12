@@ -72,6 +72,15 @@ Basic Usage
 *   修改_include/themes/default.html中的个人信息为自己的，也可以删除掉一些自己不需要的内容
 *   git post tagline="hello world"
 *   本地查看jekyll build, jekyll server
+*   在GitHub上创建个人主页,创建名为UserName.github.io的版本库
+
+再执行如下操作
+
+    $ git init
+    $ git add .
+    $ git commit -m "first commit"
+    $ git remote add origin git@github.com:Ryan311/Ryan311.github.io.git
+    $ git push -u origin master
 
 我使用模板的是(http://blog.evercoding.net/), [More](https://github.com/mojombo/jekyll/wiki/Sites)
 
