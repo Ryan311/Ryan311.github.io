@@ -84,7 +84,7 @@ JB :
   comments :
     provider : disqus
     disqus :
-      short_name : ruihuang
+      short_name : ruihuang311
 
   # Settings for analytics helper
   # Set 'provider' to the analytics provider you want to use.
